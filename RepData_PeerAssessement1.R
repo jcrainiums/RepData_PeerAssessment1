@@ -30,31 +30,30 @@ stepsvec <- sapply(StepsByDayFrame$DATE, GetStepsByDate)
 intervalvec <- sapply(StepsByIntervalFrame$INTERVAL, GetStepsByInterval)
 
 # check the frames for errors
-StepsByDayFrame <- cbind(StepsByDayFrame, stepsvec, stringsAsFactors = FALSE)
+StepsByDayFrame <- cbind(StepsByDayFrame, datesum = stepsvec, stringsAsFactors = FALSE)
 head(StepsByDayFrame)
 
-StepsByIntervalFrame <- cbind(StepsByIntervalFrame, intervalvec, 
+StepsByIntervalFrame <- cbind(StepsByIntervalFrame, intervalsum = intervalvec, 
                               stringsAsFactors = FALSE)
 head(StepsByIntervalFrame)
 
 # Plot the day and steps on a histogram
-plot( x = StepsByDayFrame$DATE, y = StepsByDayFrame$stepsvec, type = "h",
+plot( x = StepsByDayFrame$DATE, y = StepsByDayFrame$datesum, type = "h",
       xlab = "Date", ylab = "Sum of Steps")
 
 # print mean and median steps taken daily
-MeanSteps <- mean(StepsByDayFrame$stepsvec)
-MedianSteps <- median(StepsByDayFrame$stepsvec)
+MeanSteps <- mean(StepsByDayFrame$datesum)
+MedianSteps <- median(StepsByDayFrame$datesum)
 print(MeanSteps)
 print(MedianSteps)
 
 # plot interval activity
-plot ( x = StepsByIntervalFrame$INTERVAL, y = StepsByIntervalFrame$intervalvec,
+plot ( x = StepsByIntervalFrame$INTERVAL, y = StepsByIntervalFrame$intervalsum,
        type = "l",
        xlab = "Interval", ylab = "Sum of Steps")
 
 # get and print max
-MaxSteps <- max(StepsByIntervalFrame$intervalvec)
-print(MaxSteps)
+print(StepsByIntervalFrame[StepsByIntervalFrame$intervalsum == max(StepsByIntervalFrame$intervalsum),])
 
 # create a new set of data from DataSet and replace NA values
 NewSet <- DataSet
@@ -129,6 +128,8 @@ sbiSet <- cbind(sbiSet, WeekdayMean=weekdayVec,
 
 par(mfrow = c(2,1))
 plot(sbiSet$INTERVAL, sbiSet$WeekdayMean, type="l",
-     xlab = "Interval", ylab = "Weekday Mean")
+     xlab = "Interval", ylab = "Weekday Mean",
+     ylim = c(0,250))
 plot(sbiSet$INTERVAL, sbiSet$WeekendMean, type="l",
-     xlab = "Interval", ylab = "Weekend Mean")
+     xlab = "Interval", ylab = "Weekend Mean",
+     ylim = c(0,250))
