@@ -1,0 +1,80 @@
+---
+title: "PA1_Template"
+author: "Jason Crain"
+date: "January 21, 2016"
+output: html_document
+---
+
+# Loading and preprocessing
+
+Load up the activity data from the git repo. Take a look at the contents to
+figure out what we need to do.
+
+```{r echo = TRUE }
+DataSet <- read.csv("activity.csv")
+head(DataSet)
+```
+
+Looks like there's a lot of NA data. Take a quick look for non NA data.
+
+```{r echo = TRUE}
+head(DataSet[ which (is.na(DataSet$steps) == FALSE), ])
+
+```
+
+OK.. so lots of zeros, as well.. what else is there?
+
+```{r echo = TRUE}
+head(DataSet[ which (DataSet$steps > 5), ])
+
+```
+
+OK. Found good data. I don't think there's any need to preprocess the data.
+
+# Daily mean and activity
+
+To start looking into the daily mean and the activity across different intervals,
+take a subset of the data, removing NA values.
+```{r echo = TRUE}
+NoNASet <- DataSet[ which (is.na(DataSet$steps) == FALSE), ]
+```
+
+After that, get the dates and interval values for use later, and make two frames.
+One will contain the sum of steps per day, and the other will contain the sum of
+steps per interval.
+```{r echo = TRUE}
+# Get dates and intervals from the set for use later
+Dates <- as.Date(unique(NoNASet$date))
+Intervals <- unique(NoNASet$interval)
+
+# Setup two frames for use to show by date and by interval
+StepsByDayFrame <- data.frame(stringsAsFactors = FALSE, DATE = Dates)
+StepsByIntervalFrame <- data.frame(stringsAsFactors = FALSE, INTERVAL = Intervals)
+```
+
+Now, we're going to want to use a function so that we can get aggregate data.
+After we make the functions, use sapply to apply them to each unique value for
+date and interval.
+```{r echo = TRUE}
+# Function to get steps and lapply to get a list
+GetStepsByDate <- function(n) {
+    sum(NoNASet[ which (as.Date(NoNASet$date) == n), 1])
+}
+GetStepsByInterval <- function(i) {
+    sum(NoNASet [ which (NoNASet$interval == i), 1])
+}
+
+stepsvec <- sapply(StepsByDayFrame$DATE, GetStepsByDate)
+intervalvec <- sapply(StepsByIntervalFrame$INTERVAL, GetStepsByInterval)
+```
+
+Now, let's finish making the frames and check the data to see how we did.
+```{r echo = TRUE}
+# check the frames for errors
+StepsByDayFrame <- cbind(StepsByDayFrame, datemean = stepsvec, stringsAsFactors = FALSE)
+head(StepsByDayFrame)
+
+StepsByIntervalFrame <- cbind(StepsByIntervalFrame, intervalmean = intervalvec, 
+                              stringsAsFactors = FALSE)
+head(StepsByIntervalFrame)
+```
